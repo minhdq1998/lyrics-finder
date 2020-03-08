@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lyrics Finder</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+  <body>
+    <div id="app">
+        <div class="container">
+        <form>
+            <div class="col-md-6 offset-3 top-box">
+                <h3>Find Your Song Lyrics</h3>
+                <input type="text" class="form-control" placeholder="Artists" v-model="artist">
+                <br>
+                <input type="text" class="form-control" placeholder="Song" v-model="song">
+                <br>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <p v-html="lyrics" class="lyrics-p"></p>
+            </div>
+        </form>
+    </div>
+    </div>
+  </body>
+
+  <script src="https://unpkg.com/vue@2.0.3/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios@0.12.0/dist/axios.min.js"></script>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        message: 'Hello Vue World',
+        artist: '',
+        song: '',
+        lyrics: ''
+      },
+      watch: {
+        artist () {
+            this.lyrics = ''
+            if (this.artist.length >= 3 && this.song.length >=3) {
+                this.lookUpSong()
+            }
+        },
+        song () {
+            this.lyrics = ''
+            if (this.song.length >=3 && this.artist.length >= 3){
+                this.lookUpSong()
+            }
+        }
+      },
+      methods: {
+        lookUpSong: function() {
+            var app = this
+            this.lyrics = 'Searching ...'
+            axios.get('https://api.lyrics.ovh/v1/' + app.artist + '/' + app.song)
+                .then(function (response) {
+                    app.lyrics =  JSON.stringify(response.data.lyrics).split('\n').join('<br/>')
+                })
+                .catch( function (error) {
+                    app.lyrics = "No Lyrics Found"
+                })
+        }
+      }
+    })
+  </script>
+</html>
